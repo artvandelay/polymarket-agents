@@ -10,14 +10,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 async def test_openrouter():
-    """Test OpenRouter API with a simple prompt."""
     api_key = os.getenv("OPENROUTER_API_KEY")
     
     if not api_key:
-        print("❌ ERROR: OPENROUTER_API_KEY not found in .env")
+        print("❌ OPENROUTER_API_KEY not found")
         return False
     
-    print(f"✓ API key loaded (starts with: {api_key[:20]}...)")
+    print(f"✓ Key: {api_key[:20]}...")
     
     # OpenRouter API endpoint
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -39,7 +38,7 @@ async def test_openrouter():
         "max_tokens": 50
     }
     
-    print("\n🔄 Sending test request to OpenRouter...")
+    print("\n🔄 Testing...")
     
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
@@ -49,8 +48,7 @@ async def test_openrouter():
             data = response.json()
             message = data["choices"][0]["message"]["content"]
             
-            print(f"✅ SUCCESS! Response from Claude Sonnet:")
-            print(f"   {message}\n")
+            print(f"✅ {message}\n")
             return True
             
     except httpx.HTTPStatusError as e:
@@ -63,16 +61,16 @@ async def test_openrouter():
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("Testing OpenRouter API Connection")
+    print("Testing OpenRouter")
     print("=" * 50 + "\n")
     
     success = asyncio.run(test_openrouter())
     
     if success:
         print("=" * 50)
-        print("✅ OpenRouter is working! Ready to build the bot.")
+        print("✅ Ready")
         print("=" * 50)
     else:
         print("=" * 50)
-        print("❌ OpenRouter test failed. Check your API key.")
+        print("❌ Failed")
         print("=" * 50)

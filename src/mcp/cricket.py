@@ -1,12 +1,4 @@
-"""
-Cricket-specific MCP server.
-
-Extends BaseMCPServer with 4 cricket discovery tools:
-  - list_cricket_leagues
-  - list_cricket_matches
-  - get_match
-  - get_market_types
-"""
+"""Cricket-specific MCP server."""
 
 from __future__ import annotations
 
@@ -18,20 +10,14 @@ import mcp.types as types
 
 from .base import BaseMCPServer, format_events, format_event_detail
 from ..polymarket import gamma
+from ..domains.cricket.constants import CRICKET_KEYWORDS
 
 logger = logging.getLogger(__name__)
 
-# Keywords used to filter /sports for cricket leagues
-_CRICKET_KEYWORDS = {"cri", "t20", "ipl", "bbl", "bpl", "sa20", "ilt20", "wpl"}
-
 
 class CricketMCPServer(BaseMCPServer):
-    """MCP server for Polymarket cricket market research."""
-
     def __init__(self) -> None:
         super().__init__(name="polymarket-cricket")
-
-    # ── Domain tools ─────────────────────────────────────────────────
 
     def _domain_tools(self) -> list[types.Tool]:
         return [
@@ -106,8 +92,6 @@ class CricketMCPServer(BaseMCPServer):
             ),
         ]
 
-    # ── Domain dispatch ──────────────────────────────────────────────
-
     async def _dispatch_domain(self, name: str, args: dict[str, Any]) -> Any:
         if name == "list_cricket_leagues":
             return await _list_cricket_leagues()
@@ -138,15 +122,12 @@ class CricketMCPServer(BaseMCPServer):
         return {"error": f"Unknown tool: {name}"}
 
 
-# ── Cricket-specific helpers ─────────────────────────────────────────
-
 async def _list_cricket_leagues() -> list[dict]:
-    """Filter /sports to only cricket-related leagues."""
     all_sports = await gamma.list_sports()
     results = []
     for s in all_sports:
         sport = s.get("sport", "").lower()
-        if any(kw in sport for kw in _CRICKET_KEYWORDS):
+        if any(kw in sport for kw in CRICKET_KEYWORDS):
             results.append({
                 "sport": s.get("sport"),
                 "series_id": s.get("series"),
@@ -161,7 +142,6 @@ async def _list_cricket_matches(
     include_closed: bool = False,
     limit: int = 30,
 ) -> list[dict]:
-    """List cricket matches, auto-discovering leagues if no series_id given."""
     if series_id:
         matches = await gamma.list_events(
             series_id=series_id,
@@ -192,8 +172,6 @@ async def _list_cricket_matches(
             logger.debug("No matches for series %s", sid)
     return format_events(all_matches)
 
-
-# ── Entry point ──────────────────────────────────────────────────────
 
 def main() -> None:
     logging.basicConfig(

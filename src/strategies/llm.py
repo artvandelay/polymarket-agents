@@ -1,9 +1,5 @@
 """
-Generic LLM-powered trading strategy.
-
-Domain-agnostic — takes a PromptBuilder from the domain layer to produce
-prompts, then calls an LLM (via OpenRouter) and parses the structured
-response into a TradeDecision.
+Generic model-powered trading strategy.
 """
 
 import logging
@@ -17,16 +13,8 @@ from ..polymarket.models import MarketSnapshot
 logger = logging.getLogger(__name__)
 
 
-class LLMStrategy(BaseStrategy):
-    """LLM-powered trading strategy that delegates prompt building to a domain."""
-
+class ReasoningStrategy(BaseStrategy):
     def __init__(self, config: dict, prompt_builder: PromptBuilder):
-        """
-        Args:
-            config: Must include 'api_key'; optionally 'model', 'temperature',
-                    'max_tokens', 'min_confidence'.
-            prompt_builder: Domain-specific PromptBuilder implementation.
-        """
         super().__init__(config)
         self.api_key = config["api_key"]
         self.model = config.get("model", "anthropic/claude-3.5-sonnet")
@@ -37,9 +25,7 @@ class LLMStrategy(BaseStrategy):
 
     @property
     def name(self) -> str:
-        return f"LLM Strategy ({self.model})"
-
-    # ── Main entry ───────────────────────────────────────────────────
+        return f"Reasoning Strategy ({self.model})"
 
     async def analyze(
         self,
@@ -47,7 +33,6 @@ class LLMStrategy(BaseStrategy):
         portfolio_summary: dict[str, Any],
         existing_position: Optional[Any] = None,
     ) -> TradeDecision:
-        """Use the LLM to analyze a market and return a trade decision."""
         prompt = self.prompt_builder.build_analysis_prompt(
             snapshot, portfolio_summary, existing_position
         )
@@ -56,7 +41,6 @@ class LLMStrategy(BaseStrategy):
             response_text = await self._call_llm(prompt)
             decision = self._parse_response(response_text, snapshot)
 
-            # Filter by confidence threshold
             if decision.action == "BUY" and decision.confidence < self.min_confidence:
                 return TradeDecision(
                     action="PASS",
@@ -72,10 +56,7 @@ class LLMStrategy(BaseStrategy):
             logger.error("LLM strategy error: %s", e)
             return TradeDecision(action="PASS", reasoning=f"Error: {e}")
 
-    # ── LLM call ─────────────────────────────────────────────────────
-
     async def _call_llm(self, prompt: str) -> str:
-        """Call an LLM via OpenRouter API."""
         url = "https://openrouter.ai/api/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -94,22 +75,8 @@ class LLMStrategy(BaseStrategy):
             data = response.json()
             return data["choices"][0]["message"]["content"]
 
-    # ── Response parser ──────────────────────────────────────────────
-
     @staticmethod
     def _parse_response(response: str, snapshot: MarketSnapshot) -> TradeDecision:
-        """
-        Parse the LLM's structured response into a TradeDecision.
-
-        Expected format (one field per line):
-            ACTION: BUY
-            OUTCOME: England
-            SIDE: YES
-            SIZE: 100
-            CONFIDENCE: 0.8
-            EDGE: 3.5
-            REASONING: Some explanation ...
-        """
         data: dict[str, str] = {}
         for line in response.strip().splitlines():
             if ":" in line:
@@ -120,7 +87,6 @@ class LLMStrategy(BaseStrategy):
         outcome_raw = data.get("outcome", "N/A")
         outcome: Optional[str] = None if outcome_raw == "N/A" else outcome_raw
 
-        # Resolve token_id from snapshot outcomes
         token_id: Optional[str] = None
         if outcome and snapshot.outcomes:
             for name, out_data in snapshot.outcomes.items():
@@ -129,7 +95,6 @@ class LLMStrategy(BaseStrategy):
                     outcome = name  # use canonical name
                     break
 
-        # Parse numeric fields safely
         def _float(key: str, default: float = 0.0) -> float:
             try:
                 return float(data.get(key, str(default)))

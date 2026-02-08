@@ -1,17 +1,4 @@
-"""
-Base MCP server with generic Polymarket tools.
-
-Provides 6 domain-agnostic tools that work with any Polymarket market:
-  - get_odds
-  - get_orderbook
-  - get_spread
-  - get_price_history
-  - search_events
-  - analyze_odds
-
-Domain-specific servers (cricket, crypto, …) inherit from this and
-register additional discovery tools.
-"""
+"""Base MCP server with generic Polymarket tools."""
 
 from __future__ import annotations
 
@@ -30,22 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 class BaseMCPServer:
-    """
-    Base MCP server exposing generic Polymarket tools.
-
-    Subclass and override ``_domain_tools`` and ``_dispatch_domain``
-    to add domain-specific tools (e.g. ``list_cricket_leagues``).
-    """
 
     def __init__(self, name: str = "polymarket"):
         self.server = Server(name)
         self._register_handlers()
 
-    # ── Registration ─────────────────────────────────────────────────
-
     def _register_handlers(self) -> None:
-        """Wire up list_tools and call_tool handlers."""
-
         @self.server.list_tools()
         async def list_tools() -> list[types.Tool]:
             base_tools = self._base_tools()
@@ -63,8 +40,6 @@ class BaseMCPServer:
                 logger.error("Tool %s failed: %s", name, e)
                 text = json.dumps({"error": str(e), "tool": name}, indent=2)
             return [types.TextContent(type="text", text=text)]
-
-    # ── Base tools (generic Polymarket) ──────────────────────────────
 
     @staticmethod
     def _base_tools() -> list[types.Tool]:
@@ -201,16 +176,10 @@ class BaseMCPServer:
             ),
         ]
 
-    # ── Domain tools (override in subclass) ──────────────────────────
-
     def _domain_tools(self) -> list[types.Tool]:
-        """Return domain-specific tool definitions.  Override in subclass."""
         return []
 
-    # ── Dispatch ─────────────────────────────────────────────────────
-
     async def _dispatch(self, name: str, args: dict[str, Any]) -> Any:
-        """Route tool calls — base tools first, then domain."""
 
         # --- generic Polymarket tools ---
         if name == "get_odds":
@@ -262,13 +231,9 @@ class BaseMCPServer:
         return await self._dispatch_domain(name, args)
 
     async def _dispatch_domain(self, name: str, args: dict[str, Any]) -> Any:
-        """Override in subclass to handle domain-specific tools."""
         return {"error": f"Unknown tool: {name}"}
 
-    # ── Run ──────────────────────────────────────────────────────────
-
     async def run(self) -> None:
-        """Start the MCP server on stdio."""
         logger.info("Starting MCP server '%s' ...", self.server.name)
         async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
             await self.server.run(
@@ -278,10 +243,7 @@ class BaseMCPServer:
             )
 
 
-# ── Shared formatters (used by base + domain servers) ────────────────
-
 def format_events(events: list[dict]) -> list[dict]:
-    """Format a list of raw Gamma events into a concise summary."""
     results = []
     for e in events:
         markets_summary = []
@@ -328,7 +290,6 @@ def format_events(events: list[dict]) -> list[dict]:
 
 
 def format_event_detail(event: dict) -> dict:
-    """Format a single event with full detail."""
     formatted = format_events([event])
     if formatted:
         detail = formatted[0]

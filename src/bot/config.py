@@ -1,8 +1,4 @@
-"""
-Configuration loader for trading bot.
-
-Reads a YAML config and injects secrets from environment variables.
-"""
+"""Load YAML config and inject env vars."""
 
 import os
 
@@ -13,15 +9,9 @@ load_dotenv()
 
 
 def load_config(config_path: str = "config.yaml") -> dict:
-    """
-    Load configuration from YAML file.
-
-    Injects OPENROUTER_API_KEY into strategies.ai.api_key automatically.
-    """
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    # Inject API key from environment
     if "strategies" in config and "ai" in config["strategies"]:
         api_key = os.getenv("OPENROUTER_API_KEY")
         if not api_key:

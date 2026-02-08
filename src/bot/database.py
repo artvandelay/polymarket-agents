@@ -1,8 +1,4 @@
-"""
-SQLite database for trading bot persistence.
-
-Domain-agnostic — stores portfolio state, positions, and decision logs.
-"""
+"""SQLite database for persistence."""
 
 import aiosqlite
 import logging
@@ -61,25 +57,19 @@ CREATE INDEX IF NOT EXISTS idx_decisions_timestamp ON decisions(timestamp);
 
 
 class Database:
-    """Simple async SQLite database for trading bot."""
-
     def __init__(self, db_path: str = DEFAULT_DB_PATH):
         self.db_path = db_path
 
     async def init_schema(self) -> None:
-        """Create tables if they don't exist."""
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         async with aiosqlite.connect(self.db_path) as db:
             await db.executescript(CREATE_TABLES_SQL)
             await db.commit()
-        logger.info("Database initialized: %s", self.db_path)
 
     async def reset(self) -> None:
-        """Drop all tables and recreate (for testing)."""
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute("DROP TABLE IF EXISTS portfolio_state")
             await db.execute("DROP TABLE IF EXISTS positions")
             await db.execute("DROP TABLE IF EXISTS decisions")
             await db.commit()
         await self.init_schema()
-        logger.info("Database reset complete")
