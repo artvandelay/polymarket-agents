@@ -161,18 +161,37 @@ From real market as of Feb 8, 2026:
 ## Project Structure
 
 ```
-/Users/jigar/LLM-apps/polymarket-live/
-  src/
-    gamma.py        -- Gamma API client (sports discovery, events)
-    clob.py         -- CLOB API client (prices, orderbook, analysis)
-    server.py       -- MCP server (10 tools, stdio transport)
-  pyproject.toml    -- Dependencies: mcp, httpx, pydantic, websockets
-  .env              -- Config (LOG_LEVEL=INFO)
-  AGENTS.md         -- This file
+src/
+├── polymarket/              # Pure API clients (domain-agnostic)
+│   ├── gamma.py            # Gamma API (events/markets discovery)
+│   ├── clob.py             # CLOB API (pricing/orderbook)
+│   ├── models.py           # Pydantic models
+│   └── utils.py            # Shared utilities
+│
+├── mcp/                    # MCP servers for Cursor integration
+│   ├── base.py            # Base server with generic tools
+│   └── cricket.py         # Cricket-specific server (main entry point)
+│
+├── bot/                   # Trading bot framework (separate from MCP)
+│   ├── base.py           # Base bot with main loop
+│   ├── config.py         # Configuration loader
+│   ├── database.py       # SQLite persistence
+│   └── portfolio.py      # Portfolio/position management
+│
+├── domains/              # Domain-specific implementations
+│   └── cricket/
+│       ├── bot.py       # Cricket bot runner
+│       ├── scanner.py   # Market scanner
+│       └── prompts.py   # LLM prompts
+│
+└── strategies/           # Pluggable trading strategies
+    ├── base.py          # Base strategy interface
+    └── llm.py           # LLM-powered strategy
 ```
 
-**Virtual environment**: `~/pyenv/polymarket-cricket`  
-**MCP config**: `~/.cursor/mcp.json` → `polymarket-cricket` server
+**Entry point**: `src/mcp/cricket.py:main()` (command: `polymarket-cricket`)  
+**Config**: `pyproject.toml` defines the `polymarket-cricket` script  
+**MCP integration**: Typically configured in `~/.cursor/mcp.json`
 
 ## APIs Used
 

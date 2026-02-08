@@ -74,11 +74,16 @@ src/
 ### Installation
 
 ```bash
-cd ~/LLM-apps/polymarket-live
-source ~/pyenv/polymarket-cricket/bin/activate
+# Clone the repository
+git clone https://github.com/artvandelay/polymarket-agents.git
+cd polymarket-agents
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-uv pip install mcp httpx pydantic websockets python-dotenv pyyaml aiosqlite
+pip install mcp httpx pydantic websockets python-dotenv pyyaml aiosqlite
 ```
 
 ### Configuration
@@ -297,13 +302,13 @@ See `AGENTS.md` for detailed documentation and example workflows.
 
 **Version:** 0.1.0
 
-This is an early release focused on paper trading and research. The core functionality works well:
+This is an early release focused on paper trading and research. The core functionality is implemented:
 
-- API clients stable and performant
-- Bot executes trading loops reliably
-- AI makes sensible decisions
-- Portfolio tracking accurate
-- Database persistence working
+- API clients operational
+- Bot executes trading loops
+- AI decision-making integrated
+- Portfolio tracking implemented
+- Database persistence functional
 
 **Not yet implemented:**
 - Real MCP data integration (currently uses mock data in some places)
@@ -339,7 +344,7 @@ Real money trading support is not planned. This tool is designed for research an
 
 ### Paper Trading Only
 
-This bot does not execute real trades. It simulates trades to track performance without risking money. Perfect for:
+This bot does not execute real trades. It simulates trades to track performance without risking money. Use cases:
 
 - Learning betting strategy
 - Testing AI decision-making
@@ -351,7 +356,6 @@ This bot does not execute real trades. It simulates trades to track performance 
 OpenRouter charges per token for Claude API calls:
 - Approximately $0.002 per decision (500 tokens)
 - 2 hours at 5-min intervals: ~24 cycles × 2 matches × $0.002 = ~$0.10/session
-- Very affordable for testing and development
 
 ### Data Sources
 

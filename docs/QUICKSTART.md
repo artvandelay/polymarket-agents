@@ -1,8 +1,8 @@
 # Trading Bot - Quick Start Guide
 
-## What We Built
+## What This Is
 
-A fully functional AI-powered paper trading bot that:
+An AI-powered paper trading bot that:
 - Monitors cricket matches on Polymarket every 5 minutes
 - Uses Claude (via OpenRouter) to analyze markets and make decisions
 - Manages portfolio with $1,000 starting capital
@@ -49,8 +49,8 @@ data/trading.db          # Trading database
 
 ### Option 1: Quick Test (3 minutes)
 ```bash
-cd ~/LLM-apps/polymarket-live
-source ~/pyenv/polymarket-cricket/bin/activate
+# Activate your virtual environment first
+source venv/bin/activate  # adjust path as needed
 
 # Run for ~3 minutes with 1-minute intervals
 python -m src.domains.cricket.bot --duration 0.05 --interval 1
@@ -150,13 +150,13 @@ Create new strategy files in `src/strategies/`:
 
 ## Testing
 
-The bot is currently set up with:
+Current implementation:
 - Mock market data (England vs Nepal, Afghanistan vs NZ)
-- Working AI strategy (Claude makes real decisions)
-- Full portfolio management
+- AI strategy (Claude API integration)
+- Portfolio management
 - Database persistence
 
-Everything works end-to-end. Next step is real MCP data integration.
+Next step is real MCP data integration.
 
 ## Dependencies
 
