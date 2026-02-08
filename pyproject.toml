@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "polymarket-live"
+version = "0.1.0"
+description = "Polymarket research MCP server and trading bot framework"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.0.0",
+    "websockets>=12.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "aiosqlite>=0.19.0",
+]
+
+[project.scripts]
+# MCP servers (Cursor agent workflow)
+polymarket-cricket = "src.mcp.cricket:main"
+
+# Bot runners (script workflow)
+cricket-bot = "src.domains.cricket.bot:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

@@ -1,0 +1,32 @@
+# Trading Bot Configuration
+
+trading:
+  starting_capital: 1000
+  interval_minutes: 5
+  duration_hours: 2
+  max_position_size_pct: 30  # Max 30% of capital per trade
+  min_liquidity: 1000  # Skip matches with < $1k liquidity
+  strategy: ai  # Which strategy to use: "ai"
+
+markets:
+  types: ["moneyline"]  # Only trade moneyline markets
+  min_volume: 5000  # Only trade matches with > $5k volume
+
+risk:
+  stop_loss_pct: 50  # Close position if down 50%
+  take_profit_pct: 100  # Consider taking profit at 100% gain
+
+# Strategy-specific configs
+strategies:
+  ai:
+    model: anthropic/claude-3.5-sonnet  # OpenRouter model ID
+    temperature: 0.7
+    min_confidence: 0.6  # AI must be 60%+ confident to trade
+    max_tokens: 500
+
+database:
+  path: data/trading.db
+
+logging:
+  level: INFO
+  file: logs/trading_bot.log
