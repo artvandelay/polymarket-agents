@@ -167,14 +167,14 @@ Already installed:
 - `python-dotenv` - Environment variables
 - `pyyaml` - Config loader
 
-## Key Features
+## Architecture Notes
 
-**Methodical design**: Built component by component, tested each piece  
-**Clean architecture**: MCP / Trading / Strategies separated  
-**Pluggable strategies**: Easy to swap or add new strategies  
-**Real AI analysis**: Claude makes contextual trading decisions  
-**Paper trading**: No real money, just simulations  
-**Full portfolio tracking**: Positions, P&L, trade history
+- Component-based design with clear separation of concerns
+- MCP server, trading bot, and strategies are independent modules
+- Strategy system allows swapping or adding new strategies
+- AI analysis via Claude API integration
+- Paper trading simulation (no real money)
+- Portfolio tracking with positions, P&L, and trade history
 
 ---
 

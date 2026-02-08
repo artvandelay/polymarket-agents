@@ -69,7 +69,6 @@ src/
 
 - Python 3.11+
 - OpenRouter API key (for Claude access)
-- Virtual environment in `~/pyenv/polymarket-cricket`
 
 ### Installation
 
