@@ -1,5 +1,7 @@
 # Polymarket Live
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/artvandelay/polymarket-agents)
+
 An AI-powered trading bot and MCP server for analyzing cricket betting markets on Polymarket.
 
 ## Overview
